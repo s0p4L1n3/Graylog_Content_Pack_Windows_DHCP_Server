@@ -17,8 +17,8 @@ The Content Pack should be compatible with all Graylog 5.X version.
 
 ## Not included
 
-- [macaddress_list.csv](https://github.com/s0p4L1n3/Graylog_Content_Pack_Windows_DHCP_Server/files/12485332/macaddress_list.csv)
-- [dhcpv4_opcode.csv](https://github.com/s0p4L1n3/Graylog_Content_Pack_Windows_DHCP_Server/files/12485350/dhcpv4_opcode.csv)
+- [macaddress.csv](macaddress_list.csv)
+- [dhcpv4_opcode.csv](dhcpv4_opcode.csv)
 
 Add it to your Graylog server in /srv or if different location, modify the content_pack.json to change location path.
 
