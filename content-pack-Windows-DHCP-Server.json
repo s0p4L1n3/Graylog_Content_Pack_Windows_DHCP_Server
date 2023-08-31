@@ -1,0 +1,1304 @@
+{
+  "v": 1,
+  "id": "ee7cfb3d-bce6-41f7-8368-fc48732bdd45",
+  "rev": 1,
+  "name": "Filebeat - DHCP Server - Audit Log file",
+  "summary": "Content pack for Windows DHCP Server - Containing pipelines, lookup table and more",
+  "description": "",
+  "vendor": "s0p4L1n3",
+  "url": "https://github.com/s0p4L1n3/Graylog_Content_Pack_Windows_DHCP_Server",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "input",
+        "version": "1"
+      },
+      "id": "fee08786-1830-4a45-97dc-7007789fd9b2",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "beats"
+        },
+        "configuration": {
+          "tls_key_file": {
+            "@type": "string",
+            "@value": ""
+          },
+          "port": {
+            "@type": "integer",
+            "@value": 5044
+          },
+          "tls_enable": {
+            "@type": "boolean",
+            "@value": false
+          },
+          "recv_buffer_size": {
+            "@type": "integer",
+            "@value": 1048576
+          },
+          "tcp_keepalive": {
+            "@type": "boolean",
+            "@value": false
+          },
+          "tls_client_auth_cert_file": {
+            "@type": "string",
+            "@value": ""
+          },
+          "bind_address": {
+            "@type": "string",
+            "@value": "0.0.0.0"
+          },
+          "no_beats_prefix": {
+            "@type": "boolean",
+            "@value": true
+          },
+          "tls_cert_file": {
+            "@type": "string",
+            "@value": ""
+          },
+          "tls_client_auth": {
+            "@type": "string",
+            "@value": "disabled"
+          },
+          "charset_name": {
+            "@type": "string",
+            "@value": "UTF-8"
+          },
+          "number_worker_threads": {
+            "@type": "integer",
+            "@value": 4
+          },
+          "tls_key_password": {
+            "@type": "string",
+            "@value": ""
+          }
+        },
+        "static_fields": {},
+        "type": {
+          "@type": "string",
+          "@value": "org.graylog.plugins.beats.Beats2Input"
+        },
+        "global": {
+          "@type": "boolean",
+          "@value": true
+        },
+        "extractors": []
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "stream",
+        "version": "1"
+      },
+      "id": "d8d67e7c-7145-499f-a612-837fbc6bb930",
+      "data": {
+        "alarm_callbacks": [],
+        "outputs": [],
+        "remove_matches": {
+          "@type": "boolean",
+          "@value": true
+        },
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat"
+        },
+        "stream_rules": [
+          {
+            "type": {
+              "@type": "string",
+              "@value": "EXACT"
+            },
+            "field": {
+              "@type": "string",
+              "@value": "beats_type"
+            },
+            "value": {
+              "@type": "string",
+              "@value": "filebeat"
+            },
+            "inverted": {
+              "@type": "boolean",
+              "@value": false
+            },
+            "description": {
+              "@type": "string",
+              "@value": ""
+            }
+          }
+        ],
+        "alert_conditions": [],
+        "matching_type": {
+          "@type": "string",
+          "@value": "AND"
+        },
+        "disabled": {
+          "@type": "boolean",
+          "@value": false
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "default_stream": {
+          "@type": "boolean",
+          "@value": false
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "3d54b046-a8e3-421c-bb6d-ff43110cba91",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server - MAC Vendor from mac_prefix"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"Filebeat - DHCP Server - MAC Vendor from mac_prefix\"\n\nwhen\n  has_field(\"dhcpv4_client_mac_prefix\")\n  then\n   let new_macvendor = lookup_value(\"mac_to_vendor\", to_string($message.dhcpv4_client_mac_prefix));\n   set_field(\"mac_vendor\", new_macvendor);\n\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "22d1a3ec-024e-492c-bde8-51ff8aab0457",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server - Prefix Extractor"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"Filebeat - DHCP Server - Prefix Extractor\"\n\nwhen\n  has_field(\"dhcpv4_client_mac\")\nthen\n   let extract_prefix = regex(\n       pattern: \"^([\\\\dA-Za-z]{6})\",\n       value: to_string($message.dhcpv4_client_mac)\n       );\n   set_field(\"dhcpv4_client_mac_prefix\", to_string(extract_prefix[\"0\"]));\n\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_table",
+        "version": "1"
+      },
+      "id": "d80e5810-5918-4b5f-b3f6-434885f6903e",
+      "data": {
+        "default_single_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "cache_name": {
+          "@type": "string",
+          "@value": "7f1284dc-725e-4d84-ac0b-166806f56107"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "mac_to_vendor"
+        },
+        "default_multi_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "default_multi_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "data_adapter_name": {
+          "@type": "string",
+          "@value": "6e9cf557-69f9-4cd5-8977-1beed433a574"
+        },
+        "_scope": {
+          "@type": "string",
+          "@value": "DEFAULT"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "mac_to_vendor"
+        },
+        "default_single_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Verify the macaddress and the matching vendor to create a new field"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_table",
+        "version": "1"
+      },
+      "id": "7b5d90e5-e93e-4c4a-b5da-bc2100a2b955",
+      "data": {
+        "default_single_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "cache_name": {
+          "@type": "string",
+          "@value": "7f1284dc-725e-4d84-ac0b-166806f56107"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "dhcp_op_code"
+        },
+        "default_multi_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "default_multi_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "data_adapter_name": {
+          "@type": "string",
+          "@value": "b9b76488-e4c8-4229-b8d2-6edb6c593b49"
+        },
+        "_scope": {
+          "@type": "string",
+          "@value": "DEFAULT"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "dhcp_op_code"
+        },
+        "default_single_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Verify the OP Code and string that match to create a new field"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "dashboard",
+        "version": "2"
+      },
+      "id": "f20429d5-25d5-42f4-a866-e86f6bc1902f",
+      "data": {
+        "summary": {
+          "@type": "string",
+          "@value": ""
+        },
+        "search": {
+          "queries": [
+            {
+              "id": "db4021af-815f-4ed5-8415-dad1b8f4a279",
+              "timerange": {
+                "from": 300,
+                "type": "relative"
+              },
+              "filters": [],
+              "query": {
+                "type": "elasticsearch",
+                "query_string": ""
+              },
+              "search_types": [
+                {
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": ""
+                  },
+                  "name": "chart",
+                  "timerange": {
+                    "keyword": "today",
+                    "timezone": "Europe/Paris",
+                    "type": "keyword"
+                  },
+                  "column_limit": null,
+                  "streams": [],
+                  "row_limit": null,
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Total",
+                      "field": "dhcpv4_option_message_type"
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "values",
+                      "fields": [
+                        "dhcpv4_option_message_type",
+                        "dhcpv4_id"
+                      ],
+                      "limit": 15,
+                      "skip_empty_values": true
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "c65b9688-c942-4029-b00f-b2bf40ba20fa",
+                  "filters": [],
+                  "column_groups": [],
+                  "sort": []
+                },
+                {
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": "beats_type:filebeat AND tags:dhcpserver"
+                  },
+                  "name": null,
+                  "timerange": {
+                    "keyword": "today",
+                    "timezone": "Europe/Paris",
+                    "type": "keyword"
+                  },
+                  "offset": 0,
+                  "streams": [],
+                  "filter": null,
+                  "decorators": [],
+                  "type": "messages",
+                  "id": "b9775ff1-a5fe-4d6e-902c-25468e6d458f",
+                  "limit": 150,
+                  "filters": []
+                },
+                {
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": ""
+                  },
+                  "name": "chart",
+                  "timerange": {
+                    "keyword": "today",
+                    "timezone": "Europe/Paris",
+                    "type": "keyword"
+                  },
+                  "column_limit": null,
+                  "streams": [],
+                  "row_limit": null,
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "count(dhcpv4_op_description)",
+                      "field": "dhcpv4_op_description"
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "values",
+                      "fields": [
+                        "dhcpv4_op_description"
+                      ],
+                      "limit": 15,
+                      "skip_empty_values": true
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "5176ca43-bef2-4e3e-8a3e-d48a8036ad41",
+                  "filters": [],
+                  "column_groups": [],
+                  "sort": []
+                },
+                {
+                  "query": null,
+                  "name": "chart",
+                  "timerange": null,
+                  "column_limit": null,
+                  "streams": [],
+                  "row_limit": null,
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Message Count",
+                      "field": null
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [],
+                  "type": "pivot",
+                  "id": "d390c154-570d-416f-92f7-7313e1adbbae",
+                  "filters": [],
+                  "column_groups": [],
+                  "sort": []
+                },
+                {
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": ""
+                  },
+                  "name": "chart",
+                  "timerange": {
+                    "keyword": "today",
+                    "timezone": "Europe/Paris",
+                    "type": "keyword"
+                  },
+                  "column_limit": null,
+                  "streams": [
+                    "d8d67e7c-7145-499f-a612-837fbc6bb930"
+                  ],
+                  "row_limit": null,
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "count()",
+                      "field": null
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "time",
+                      "fields": [
+                        "timestamp"
+                      ],
+                      "interval": {
+                        "type": "auto",
+                        "scaling": 1
+                      }
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "4a156c19-9faf-4bbd-9fe0-8ae2d3f7f63c",
+                  "filters": [],
+                  "column_groups": [],
+                  "sort": []
+                },
+                {
+                  "query": {
+                    "type": "elasticsearch",
+                    "query_string": ""
+                  },
+                  "name": "chart",
+                  "timerange": {
+                    "keyword": "today",
+                    "timezone": "Europe/Paris",
+                    "type": "keyword"
+                  },
+                  "column_limit": null,
+                  "streams": [],
+                  "row_limit": null,
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Total",
+                      "field": "dhcpv4_client_ip"
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "values",
+                      "fields": [
+                        "dhcpv4_client_ip",
+                        "dhcpv4_option_hostname",
+                        "mac_vendor"
+                      ],
+                      "limit": 15,
+                      "skip_empty_values": true
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "09da7259-4ca1-45b2-b321-b40c9c980466",
+                  "filters": [],
+                  "column_groups": [],
+                  "sort": []
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "requires": {},
+          "owner": "admin@lab.lan",
+          "created_at": "2023-08-24T09:14:10.083Z"
+        },
+        "created_at": "2023-08-21T10:49:05.263Z",
+        "requires": {},
+        "state": {
+          "db4021af-815f-4ed5-8415-dad1b8f4a279": {
+            "selected_fields": null,
+            "static_message_list_id": null,
+            "titles": {
+              "tab": {
+                "title": "Today"
+              },
+              "widget": {
+                "90d9d195-ddda-41c7-8275-8b0f4c5c2c9a": "Message Table",
+                "505e5f89-fb36-43f1-aaa0-9984930fd944": "Message Count (Bar)",
+                "cbc2ba93-12ce-4fb3-a47e-51c19ef0b3cf": "Message Count (Total)",
+                "c085cc1a-789f-4557-90a8-8baf94484817": "Top Message Clients",
+                "6ad22253-26d2-4d0a-af7d-8b81dd4108e5": "Top DHCP Clients",
+                "4399c93a-3a27-4518-b6b9-bb75aec4596c": "DHCP OP Code"
+              }
+            },
+            "widgets": [
+              {
+                "id": "90d9d195-ddda-41c7-8275-8b0f4c5c2c9a",
+                "type": "messages",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "keyword": "today",
+                  "timezone": "Europe/Paris",
+                  "type": "keyword"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": "beats_type:filebeat AND tags:dhcpserver"
+                },
+                "streams": [],
+                "config": {
+                  "fields": [
+                    "timestamp",
+                    "source",
+                    "dhcpv4_client_ip",
+                    "dhcpv4_option_hostname",
+                    "dhcpv4_option_message_type",
+                    "dhcpv4_client_mac",
+                    "mac_vendor",
+                    "dhcpv4_op_description"
+                  ],
+                  "show_message_row": false,
+                  "show_summary": false,
+                  "decorators": [],
+                  "sort": [
+                    {
+                      "type": "pivot",
+                      "field": "timestamp",
+                      "direction": "Descending"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "6ad22253-26d2-4d0a-af7d-8b81dd4108e5",
+                "type": "aggregation",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "keyword": "today",
+                  "timezone": "Europe/Paris",
+                  "type": "keyword"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": ""
+                },
+                "streams": [],
+                "config": {
+                  "visualization": "table",
+                  "column_limit": null,
+                  "event_annotation": false,
+                  "row_limit": 15,
+                  "row_pivots": [
+                    {
+                      "fields": [
+                        "dhcpv4_client_ip",
+                        "dhcpv4_option_hostname",
+                        "mac_vendor"
+                      ],
+                      "type": "values",
+                      "config": {
+                        "limit": 15,
+                        "skip_empty_values": true
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Total"
+                      },
+                      "function": "count(dhcpv4_client_ip)"
+                    }
+                  ],
+                  "rollup": false,
+                  "column_pivots": [],
+                  "visualization_config": {
+                    "pinned_columns": []
+                  },
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              },
+              {
+                "id": "505e5f89-fb36-43f1-aaa0-9984930fd944",
+                "type": "aggregation",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "keyword": "today",
+                  "timezone": "Europe/Paris",
+                  "type": "keyword"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": ""
+                },
+                "streams": [
+                  "d8d67e7c-7145-499f-a612-837fbc6bb930"
+                ],
+                "config": {
+                  "visualization": "bar",
+                  "column_limit": null,
+                  "event_annotation": false,
+                  "row_limit": null,
+                  "row_pivots": [
+                    {
+                      "fields": [
+                        "timestamp"
+                      ],
+                      "type": "time",
+                      "config": {
+                        "interval": {
+                          "type": "auto",
+                          "scaling": 1
+                        }
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": null
+                      },
+                      "function": "count()"
+                    }
+                  ],
+                  "rollup": true,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              },
+              {
+                "id": "cbc2ba93-12ce-4fb3-a47e-51c19ef0b3cf",
+                "type": "aggregation",
+                "filter": null,
+                "filters": [],
+                "timerange": null,
+                "query": null,
+                "streams": [],
+                "config": {
+                  "visualization": "numeric",
+                  "column_limit": null,
+                  "event_annotation": false,
+                  "row_limit": null,
+                  "row_pivots": [],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Message Count"
+                      },
+                      "function": "count()"
+                    }
+                  ],
+                  "rollup": false,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              },
+              {
+                "id": "4399c93a-3a27-4518-b6b9-bb75aec4596c",
+                "type": "aggregation",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "keyword": "today",
+                  "timezone": "Europe/Paris",
+                  "type": "keyword"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": ""
+                },
+                "streams": [],
+                "config": {
+                  "visualization": "pie",
+                  "column_limit": null,
+                  "event_annotation": false,
+                  "row_limit": 15,
+                  "row_pivots": [
+                    {
+                      "fields": [
+                        "dhcpv4_op_description"
+                      ],
+                      "type": "values",
+                      "config": {
+                        "limit": 15,
+                        "skip_empty_values": true
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": null
+                      },
+                      "function": "count(dhcpv4_op_description)"
+                    }
+                  ],
+                  "rollup": false,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              },
+              {
+                "id": "c085cc1a-789f-4557-90a8-8baf94484817",
+                "type": "aggregation",
+                "filter": null,
+                "filters": [],
+                "timerange": {
+                  "keyword": "today",
+                  "timezone": "Europe/Paris",
+                  "type": "keyword"
+                },
+                "query": {
+                  "type": "elasticsearch",
+                  "query_string": ""
+                },
+                "streams": [],
+                "config": {
+                  "visualization": "table",
+                  "column_limit": null,
+                  "event_annotation": false,
+                  "row_limit": 15,
+                  "row_pivots": [
+                    {
+                      "fields": [
+                        "dhcpv4_option_message_type",
+                        "dhcpv4_id"
+                      ],
+                      "type": "values",
+                      "config": {
+                        "limit": 15,
+                        "skip_empty_values": true
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Total"
+                      },
+                      "function": "count(dhcpv4_option_message_type)"
+                    }
+                  ],
+                  "rollup": false,
+                  "column_pivots": [],
+                  "visualization_config": {
+                    "pinned_columns": []
+                  },
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              }
+            ],
+            "widget_mapping": {
+              "90d9d195-ddda-41c7-8275-8b0f4c5c2c9a": [
+                "b9775ff1-a5fe-4d6e-902c-25468e6d458f"
+              ],
+              "505e5f89-fb36-43f1-aaa0-9984930fd944": [
+                "4a156c19-9faf-4bbd-9fe0-8ae2d3f7f63c"
+              ],
+              "cbc2ba93-12ce-4fb3-a47e-51c19ef0b3cf": [
+                "d390c154-570d-416f-92f7-7313e1adbbae"
+              ],
+              "c085cc1a-789f-4557-90a8-8baf94484817": [
+                "c65b9688-c942-4029-b00f-b2bf40ba20fa"
+              ],
+              "6ad22253-26d2-4d0a-af7d-8b81dd4108e5": [
+                "09da7259-4ca1-45b2-b321-b40c9c980466"
+              ],
+              "4399c93a-3a27-4518-b6b9-bb75aec4596c": [
+                "5176ca43-bef2-4e3e-8a3e-d48a8036ad41"
+              ]
+            },
+            "positions": {
+              "90d9d195-ddda-41c7-8275-8b0f4c5c2c9a": {
+                "col": 1,
+                "row": 7,
+                "height": 4,
+                "width": "Infinity"
+              },
+              "505e5f89-fb36-43f1-aaa0-9984930fd944": {
+                "col": 1,
+                "row": 1,
+                "height": 2,
+                "width": 9
+              },
+              "cbc2ba93-12ce-4fb3-a47e-51c19ef0b3cf": {
+                "col": 10,
+                "row": 1,
+                "height": 2,
+                "width": 3
+              },
+              "c085cc1a-789f-4557-90a8-8baf94484817": {
+                "col": 9,
+                "row": 3,
+                "height": 4,
+                "width": 4
+              },
+              "6ad22253-26d2-4d0a-af7d-8b81dd4108e5": {
+                "col": 1,
+                "row": 3,
+                "height": 4,
+                "width": 4
+              },
+              "4399c93a-3a27-4518-b6b9-bb75aec4596c": {
+                "col": 5,
+                "row": 3,
+                "height": 4,
+                "width": 4
+              }
+            },
+            "formatting": {
+              "highlighting": []
+            },
+            "display_mode_settings": {
+              "positions": {}
+            }
+          }
+        },
+        "properties": [],
+        "owner": "admin@iss.lan",
+        "title": {
+          "@type": "string",
+          "@value": "Windows DHCP Server"
+        },
+        "type": "DASHBOARD",
+        "description": {
+          "@type": "string",
+          "@value": "Dashboard for Windows DHCP Events"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "76d4fc04-5b9e-4e2e-9d13-d2c498dce6e4",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server - Grok Pattern"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server Logs - Grok Pattern Extractor"
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"Filebeat - DHCP Server - Grok Pattern\"\nwhen\n  has_field(\"message\") AND contains(to_string($message.tags),\"dhcpserver\")\nthen\n  let msg = to_string($message.message);\n  let dhcp_server_log = grok(pattern: \"^%{INT:dhcpv4_id},(?<dhcpv4_logtime>(%{MONTHNUM}\\\\/%{MONTHDAY}\\\\/%{YEAR},%{HOUR}:%{MINUTE}:%{SECOND})),%{GREEDYDATA:dhcpv4_option_message_type}?((,%{IP:dhcpv4_client_ip},%{DATA:dhcpv4_option.hostname},%{DATA:dhcpv4_client_mac},%{DATA:user_name})|(,,%{DATA:dhcpv4_option_hostname},,)|(,,,,)),%{WORD:dhcpv4_transaction_id},%{WORD:dhcpv4_op_code},,?,,%{DATA:dhcpv4_option_class_identifier},%{DATA:dhcpv4_option_vendor_identifying_options}?((,,,,)|,%{WORD:dhcpv4_option_user_identifying_options},%{WORD:dhcpv4_option_relay_agent_information},,)%{WORD:dhcpv4_option_message}\", value: to_string(msg), only_named_captures: true);\n  set_fields(dhcp_server_log);\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_cache",
+        "version": "1"
+      },
+      "id": "7f1284dc-725e-4d84-ac0b-166806f56107",
+      "data": {
+        "_scope": {
+          "@type": "string",
+          "@value": "DEFAULT"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "cache-global"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "cache-global"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "configuration": {
+          "type": {
+            "@type": "string",
+            "@value": "guava_cache"
+          },
+          "max_size": {
+            "@type": "integer",
+            "@value": 1000
+          },
+          "expire_after_access": {
+            "@type": "long",
+            "@value": 60
+          },
+          "expire_after_access_unit": {
+            "@type": "string",
+            "@value": "SECONDS"
+          },
+          "expire_after_write": {
+            "@type": "long",
+            "@value": 0
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_adapter",
+        "version": "1"
+      },
+      "id": "6e9cf557-69f9-4cd5-8977-1beed433a574",
+      "data": {
+        "_scope": {
+          "@type": "string",
+          "@value": "DEFAULT"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "mac_to_vendor"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "mac_to_vendor"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Match between mac address and vendor"
+        },
+        "configuration": {
+          "value_column": {
+            "@type": "string",
+            "@value": "Manufactor"
+          },
+          "path": {
+            "@type": "string",
+            "@value": "/srv/macaddress_list.csv"
+          },
+          "cidr_lookup": {
+            "@type": "boolean",
+            "@value": false
+          },
+          "separator": {
+            "@type": "string",
+            "@value": ";"
+          },
+          "quotechar": {
+            "@type": "string",
+            "@value": "\""
+          },
+          "key_column": {
+            "@type": "string",
+            "@value": "mac_address"
+          },
+          "case_insensitive_lookup": {
+            "@type": "boolean",
+            "@value": true
+          },
+          "type": {
+            "@type": "string",
+            "@value": "csvfile"
+          },
+          "check_interval": {
+            "@type": "long",
+            "@value": 60
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline",
+        "version": "1"
+      },
+      "id": "15eb859f-72cd-4f0f-b949-c2a56c991390",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server Logs"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Pipeline containing all the rules to extracts missing fields and adding new ones"
+        },
+        "source": {
+          "@type": "string",
+          "@value": "pipeline \"Filebeat - DHCP Server Logs\"\nstage 0 match either\nrule \"Filebeat - DHCP Server - Grok Pattern\"\nstage 1 match either\nrule \"Filebeat - DHCP Server - OP Code\"\nstage 2 match either\nrule \"Filebeat - DHCP Server - Prefix Extractor\"\nstage 3 match either\nrule \"Filebeat - DHCP Server - MAC Vendor from mac_prefix\"\nend"
+        },
+        "connected_streams": [
+          {
+            "@type": "string",
+            "@value": "d8d67e7c-7145-499f-a612-837fbc6bb930"
+          }
+        ]
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_adapter",
+        "version": "1"
+      },
+      "id": "b9b76488-e4c8-4229-b8d2-6edb6c593b49",
+      "data": {
+        "_scope": {
+          "@type": "string",
+          "@value": "DEFAULT"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "dhcp_op_code"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "dhcp_op_code"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Match between op code and op description"
+        },
+        "configuration": {
+          "value_column": {
+            "@type": "string",
+            "@value": "dhcpv4_op_description"
+          },
+          "path": {
+            "@type": "string",
+            "@value": "/srv/dhcpv4_opcode.csv"
+          },
+          "cidr_lookup": {
+            "@type": "boolean",
+            "@value": false
+          },
+          "separator": {
+            "@type": "string",
+            "@value": ";"
+          },
+          "quotechar": {
+            "@type": "string",
+            "@value": "\""
+          },
+          "key_column": {
+            "@type": "string",
+            "@value": "dhcpv4_op_code"
+          },
+          "case_insensitive_lookup": {
+            "@type": "boolean",
+            "@value": false
+          },
+          "type": {
+            "@type": "string",
+            "@value": "csvfile"
+          },
+          "check_interval": {
+            "@type": "long",
+            "@value": 60
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "3f81ee41-5e46-470e-a9be-578bb228de85",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server - OP Code"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"Filebeat - DHCP Server - OP Code\"\n\nwhen\n  has_field(\"dhcpv4_op_code\")\n  then\n   let new_op_value = lookup_value(\"dhcp_op_code\", to_string($message.dhcpv4_op_code));\n   set_field(\"dhcpv4_op_description\", new_op_value);\n\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "sidecar_collector_configuration",
+        "version": "1"
+      },
+      "id": "f3d1c54a-23a8-4311-851a-559202e07e55",
+      "data": {
+        "collector_id": {
+          "@type": "string",
+          "@value": "2cf46086-0da0-4a14-b3fe-b6e567195c28"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "Filebeat - DHCP Server"
+        },
+        "color": {
+          "@type": "string",
+          "@value": "#f8bbd0"
+        },
+        "template": {
+          "@type": "string",
+          "@value": "# Needed for Graylog\nfields_under_root: true\nfields.collector_node_id: ${sidecar.nodeName}\nfields.gl2_source_collector: ${sidecar.nodeId}\n\noutput.logstash:\n   hosts: [\"graylog.lab.lan:5044\"]\n   \npath.data: C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\\data\npath.logs: C:\\Program Files\\Graylog\\sidecar\\logs\n\nfilebeat.inputs:\n- type: log\n  enabled: true\n  encoding: utf-8\n  paths:\n    - \"C:/Windows/System32/dhcp/DhcpSrvLog-*.log\"\n  include_lines: [\"^[0-9]{2},\"]\n  fields_under_root: true\n  processors:\n  - add_tags:\n      tags: dhcpserver\n\n- type: log\n  enabled: true\n  paths:\n    - \"C:/Windows/Logs/DNS/windns.log\"\n  processors:\n  - add_tags:\n      tags: dnsserver\n  \n      "
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "sidecar_collector",
+        "version": "1"
+      },
+      "id": "2cf46086-0da0-4a14-b3fe-b6e567195c28",
+      "data": {
+        "name": {
+          "@type": "string",
+          "@value": "filebeat_windows"
+        },
+        "service_type": {
+          "@type": "string",
+          "@value": "svc"
+        },
+        "node_operating_system": {
+          "@type": "string",
+          "@value": "windows"
+        },
+        "executable_path": {
+          "@type": "string",
+          "@value": "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe"
+        },
+        "execute_parameters": {
+          "@type": "string",
+          "@value": "-c \"%s\""
+        },
+        "validation_parameters": {
+          "@type": "string",
+          "@value": "test config -c \"%s\""
+        },
+        "default_template": {
+          "@type": "string",
+          "@value": "# Needed for Graylog\nfields_under_root: true\nfields.collector_node_id: ${sidecar.nodeName}\nfields.gl2_source_collector: ${sidecar.nodeId}\n\noutput.logstash:\n   hosts: [\"graylog.lab.lan:5044\"]\n   \npath.data: C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\\data\npath.logs: C:\\Program Files\\Graylog\\sidecar\\logs\n\nfilebeat.inputs:\n- type: log\n  enabled: true\n  paths:\n    - C:\\logs\\log.log"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=5.0.0"
+        }
+      ]
+    }
+  ]
+}
