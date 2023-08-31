@@ -23,7 +23,7 @@ The Content Pack should be compatible with all Graylog 5.X version.
 Add it to your Graylog server in /srv or if different location, modify the content_pack.json to change location path.
 
 ## Requirements
-* Graylog 5.1 
+* Graylog 5.0 
 * Windows DHCP server configured
 * A log exporter/collector such as filebeats monitoring the directory path specified: (C:\Windows\system32\dhcp)
 
