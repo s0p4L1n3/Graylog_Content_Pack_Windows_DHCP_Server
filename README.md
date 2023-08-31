@@ -1,6 +1,7 @@
 # Windows DHCP Server Content Pack
 
 Tested with Filebeats 7.17.12.0 / Windows 2022 / Graylog 5.1.4
+
 The Content Pack should be compatible with all Graylog 5.X version.
 
 **Note this was built using filebeats as the log exporter. No inputs extractor were used, only pipeline rules.**
